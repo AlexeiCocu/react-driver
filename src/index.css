@@ -1,3 +1,10 @@
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -5,9 +12,123 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  background-color: #dcdcdc;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.page {
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 90vh;
+
+  padding: 0 10px 0 10px;
+}
+
+
+
+
+.btn{
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  transition: all .3s;
+  cursor: pointer;
+
+  -webkit-box-shadow: inset 0px 0px 1px 1px rgba(0,0,0,0.41);
+  box-shadow: inset 0px 0px 1px 1px rgba(0,0,0,0.41);
+
+  /*-webkit-box-shadow: 1px 1px 8px 1px rgba(0,0,0,0.39);*/
+  /*box-shadow: 1px 1px 8px 1px rgba(0,0,0,0.39);*/
+}
+
+.btn:hover{
+  background-color: #c2c2c2;
+}
+
+.btn__red{
+  background-color: darkred;
+  color: white;
+  transition: all .3s;
+}
+
+.btn__red:hover{
+  background-color: #e00a0a;
+}
+
+.btn__green{
+  background-color: seagreen;
+  color: white;
+  transition: all .3s;
+}
+
+.btn__green:hover{
+  background-color: #42cd7e;
+}
+
+.loadingSpinnerContainer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 5000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.loadingSpinner {
+  width: 64px;
+  height: 64px;
+  border: 8px solid;
+  border-color: #cc0000 transparent #990404 transparent;
+  border-radius: 50%;
+  animation: spin 1.2s linear infinite;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.socialLogin {
+  margin-top: 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.socialIconDiv {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.75rem;
+  margin: 1.5rem;
+  width: 3rem;
+  height: 3rem;
+  background-color: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1);
+}
+
+.socialIconImg {
+  width: 100%;
 }
