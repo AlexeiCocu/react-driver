@@ -1,18 +1,17 @@
 import React, {useEffect, useState} from 'react';
 import {MapContainer, Marker, Popup, TileLayer} from "react-leaflet";
 import {getAuth} from "firebase/auth";
-import {updateDoc, doc, getDoc} from 'firebase/firestore';
+import {updateDoc, doc, getDoc, collection, getDocs, query, where, orderBy, limit, startAfter} from 'firebase/firestore';
 import {db} from "../firebase.config";
+import {toast} from "react-toastify";
 import Spinner from "../components/Spinner";
 
 
 const Map = () => {
     const [user, setUser] = useState(null);
+    const [users, setUsers] = useState(null);
 
-    const [userLocation, setUserLocation] = useState({
-        lat: 1,
-        lng: 1
-    })
+    const [userLocation, setUserLocation] = useState(null)
 
     const [loading, setLoading] = useState(true);
 
@@ -35,8 +34,6 @@ const Map = () => {
     },[])
 
 
-
-
     useEffect(()=>{
         const fetchUsers = async () => {
             const docRef = doc(db, 'users', auth.currentUser.uid)
@@ -48,9 +45,43 @@ const Map = () => {
             }
         }
 
+
+        const fetchAllUsers = async () => {
+
+            try {
+                // Get reference
+                const usersRef = collection(db, 'users')
+
+                // Create a query
+                const q = query(usersRef)
+
+                // Execute query
+                const querySnap = await getDocs(q);
+
+                const allUsers = [];
+
+                querySnap.forEach((doc) => {
+                    return allUsers.push({
+                        id: doc.id,
+                        data: doc.data(),
+                        lat: doc.data().geolocation.lat,
+                        lng: doc.data().geolocation.lng
+                    })
+                })
+
+                console.log(allUsers)
+
+                setUsers(allUsers);
+                setLoading(false);
+            } catch (error) {
+                toast.error('Could not fetch users!')
+            }
+
+        }
+
+
+        fetchAllUsers()
         fetchUsers();
-
-
 
     }, [])
 
@@ -67,7 +98,13 @@ const Map = () => {
                          zoom={13} scrollWheelZoom={true}>
                <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-               <Marker position={[userLocation.lat, userLocation.lng]}/>
+               {/*<Marker position={[userLocation.lat, userLocation.lng]}/>*/}
+
+
+
+               {users.map((user) => (
+                   <Marker position={[user.lat, user.lng]} key={user.id}/>
+               ))}
 
            </MapContainer>
        </>
