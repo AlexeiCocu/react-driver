@@ -53,7 +53,7 @@ const Map = () => {
                 const usersRef = collection(db, 'users')
 
                 // Create a query
-                const q = query(usersRef)
+                const q = query(usersRef, where('email', '!=',  auth.currentUser.email))
 
                 // Execute query
                 const querySnap = await getDocs(q);
@@ -98,7 +98,7 @@ const Map = () => {
                          zoom={13} scrollWheelZoom={true}>
                <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-               {/*<Marker position={[userLocation.lat, userLocation.lng]}/>*/}
+               <Marker position={[userLocation.lat, userLocation.lng]}/>
 
 
 
