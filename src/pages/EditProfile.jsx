@@ -15,11 +15,10 @@ import { toast } from 'react-toastify'
 import Spinner from '../components/Spinner'
 
 const EditProfile = () => {
+    const [active, setActive] = useState(false)
     const [loading, setLoading] = useState(false)
     const [user, setUser] = useState(false)
     const [formData, setFormData] = useState({
-        category: '',
-        on_map: false,
         name: '',
         phone: '',
         description: '',
@@ -27,7 +26,6 @@ const EditProfile = () => {
     })
 
     const {
-        category,
         name,
         phone,
         description,
@@ -39,9 +37,16 @@ const EditProfile = () => {
     const isMounted = useRef(true)
 
 
+    // set active
+    useEffect(() => {
+
+    }, [active])
+
+
     // Fetch listing to edit
     useEffect(() => {
         setLoading(true);
+
 
         const fetchUser = async () => {
             const docRef = doc(db, 'users', auth.currentUser.uid)
@@ -49,8 +54,10 @@ const EditProfile = () => {
 
             if (docSnap.exists()){
                 setUser(docSnap.data())
+
                 setFormData({ ...docSnap.data() })
                 setLoading(false)
+
             }else{
                 navigate('/')
                 toast.error('User does not exist.')
@@ -59,6 +66,58 @@ const EditProfile = () => {
         fetchUser()
 
     }, [])
+
+
+
+    const handleActive = async () => {
+
+        setActive((prevState => !prevState))
+
+        if(active){
+            toast.error('Removed from map')
+
+        }else {
+            toast.success('Posted on map')
+        }
+
+    }
+
+    useEffect(()=>{
+
+        const fetchUser = async () => {
+            const docRef = doc(db, 'users', auth.currentUser.uid)
+            const docSnap = await getDoc(docRef)
+
+            if (docSnap.exists()){
+                setUser(docSnap.data())
+
+                setFormData({ ...docSnap.data() })
+                setLoading(false)
+
+            }else{
+                navigate('/')
+                toast.error('User does not exist.')
+            }
+        }
+
+
+
+        const setActiveStatus = async () => {
+            //Update listing
+            const docRef = doc(db, 'users', auth.currentUser.uid);
+            await updateDoc(docRef, {
+                active,
+            })
+
+        }
+
+
+        fetchUser()
+
+        setActiveStatus()
+
+
+    }, [active])
 
 
 
@@ -87,7 +146,6 @@ const EditProfile = () => {
         const docRef = doc(db, 'users', auth.currentUser.uid);
         await updateDoc(docRef, formDataCopy)
 
-
         setLoading(false)
 
         toast.success('User saved')
@@ -114,68 +172,65 @@ const EditProfile = () => {
     }
 
     return (
-        <div>
-            <header>
-                <p>Edit Profile</p>
-            </header>
+        <div className='page mt-4'>
 
-            <main>
-                <form onSubmit={onSubmit}>
 
-                    <label className='formLabel'>Name</label>
-                    <input
-                        className='formInputName'
-                        type='text'
-                        id='name'
-                        value={name}
-                        onChange={onMutate}
-                        required
-                    />
+            <form className='card col-md-6' onSubmit={onSubmit}>
 
-                    <div className='formRooms flex'>
-                        <div>
-                            <label className='formLabel'>Phone</label>
-                            <input
-                                className='formInputSmall'
-                                type='number'
-                                id='phone'
-                                value={phone}
-                                onChange={onMutate}
-                                // min='1'
-                                // max='50'
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className='formLabel'>Category</label>
-                            <input
-                                className='formInputSmall'
-                                type='text'
-                                id='category'
-                                value={category}
-                                onChange={onMutate}
-                                min='1'
-                                max='50'
-                                required
-                            />
-                        </div>
-                    </div>
+                <div className='mt-2  d-flex flex-column align-items-center justify-content-between'>
+                    <h5 className='m-1'>Edit Profile</h5>
+                    <div className={ user.active ? 'btn btn-success mt-1' : 'btn btn-danger mt-1' } onClick={()=>handleActive()} >{ user.active ? 'Online' : 'Offline'}</div>
+                </div>
+                <hr/>
 
-                    <label className='formLabel'>Description</label>
+
+                <div className="mb-3">
+                    <label htmlFor="name" className="form-label">Name</label>
+                    <input type="text"
+                           className="form-control"
+                           id="name"
+                           value={name}
+                           onChange={onMutate}
+                           required />
+                </div>
+
+                <div className="mb-3">
+                    <label htmlFor="phone" className="form-label">Phone</label>
+                    <input type="tel"
+                           className="form-control"
+                           id="phone"
+                           value={phone}
+                           onChange={onMutate}
+                           required />
+                </div>
+
+                <div className="mb-3">
+                    <label htmlFor="category" className="form-label">Category</label>
+
+                    <select className="form-control" name="category" id="category" onChange={onMutate}>
+                        <option >Select</option>
+                        <option value="client">Client</option>
+                        <option value="driver">Driver</option>
+                        <option value="seller">Seller</option>
+                        <option value="buyer">Buyer</option>
+                    </select>
+
+                </div>
+
+                <div className="mb-3">
+                    <label htmlFor="description" className="form-label">Description</label>
                     <textarea
-                        className='formInputAddress'
-                        id='description'
-                        value={description}
-                        onChange={onMutate}
-                        required
-                    />
+                        style={{height: '100px'}}
+                           className="form-control"
+                           id="description"
+                           value={description}
+                           onChange={onMutate}
+                           required />
+                </div>
 
+                <button type="submit" className="btn btn-primary">Save</button>
+            </form>
 
-                    <button type='submit'>
-                        SAVE
-                    </button>
-                </form>
-            </main>
         </div>
     );
 };

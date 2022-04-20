@@ -2,9 +2,9 @@ import React from 'react';
 import {useState, useEffect} from "react";
 import {getAuth, updateProfile} from 'firebase/auth';
 
-import {updateDoc, doc, getDoc} from 'firebase/firestore';
+import { doc, getDoc} from 'firebase/firestore';
 import {db} from '../firebase.config';
-import {useNavigate, Link, useParams} from "react-router-dom";
+import { Link } from "react-router-dom";
 import {toast} from "react-toastify";
 import Spinner from "../components/Spinner";
 
@@ -12,14 +12,7 @@ const Profile = () => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    const navigate = useNavigate;
-    const params = useParams();
     const auth = getAuth();
-    const [changeDetails, setChangeDetails] = useState(false);
-    const [formData, setFormData] = useState({
-        name: auth.currentUser.displayName,
-    });
-    const {name} = formData;
 
 
     useEffect(()=>{
@@ -38,77 +31,46 @@ const Profile = () => {
     }, [])
 
 
-    const onSubmit = async () => {
-        // try {
-        //     if(auth.currentUser.displayName !== name){
-        //         // Update display name in fb
-        //         await updateProfile(auth.currentUser, {
-        //             displayName: name
-        //         })
-        //
-        //         // Update in firestore
-        //         const userRef = doc(db, 'users', auth.currentUser.uid);
-        //         await updateDoc(userRef, {
-        //             name: name
-        //         })
-        //
-        //         toast.success('Name changed successfully!')
-        //     }
-        //
-        // }catch (error){
-        //     toast.error('Could not update profile')
-        // }
-    }
-
-    const onChange = (e) => {
-        setFormData((prevState) => ({
-            ...prevState,
-            [e.target.id]: e.target.value
-        }))
-    }
-
-
-
     if(loading){
         return <Spinner />
     }
 
 
     return (
-        <>
-            <h3>User Profile</h3>
 
-            <div>Profile Details</div>
-            <div>Personal Details</div>
-            <div className='btn'
-                 onClick={()=>{changeDetails && onSubmit()
-                        setChangeDetails((prevState) => !prevState)}
-                 }>
-                {changeDetails ? 'done' : 'change name'}
-            </div>
-            <br/>
-            <div>
-                <form>
-                    <input type="text"
-                           id='name'
-                           className={!changeDetails ? 'profileName' : 'profileNameActive'}
-                           disabled={!changeDetails}
-                           value={name}
-                           onChange={onChange}
-                    />
-                </form>
-            </div>
-            <div>
-                <h3>User details</h3>
-                <div>{user.category}</div>
-            </div>
+        <div className='d-flex justify-content-center align-items-center mt-4'>
+            <div className='card m-3'>
+                <h3 className='mt-4 text-center'>User Profile</h3>
+                <hr/>
+                <div>
+                    <h5>Name:</h5>
+                    <p>{user.name}</p>
+                </div>
+                <div>
+                    <h5>Category:</h5>
+                    <p>{user.category.charAt(0).toUpperCase() + user.category.slice(1)}</p>
+                </div>
+                <div>
+                    <h5>Phone:</h5>
+                    <p>{user.phone ? user.phone : 'not set'}</p>
+                </div>
+                <div>
+                    <h5>Description:</h5>
+                    <p>{user.description ? user.description : 'not set'}</p>
+                </div>
 
-            <div>
-                <Link to={"/edit-profile"}>
-                    <button>Edit Profile</button>
-                </Link>
+                <hr/>
+
+                <div className='center_element'>
+                    <Link to={"/edit-profile"}>
+                        <button className='btn btn__red'>Edit Profile</button>
+                    </Link>
+                </div>
             </div>
-        </>
+        </div>
+
+
+
     )
 };
 

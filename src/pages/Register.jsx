@@ -14,13 +14,14 @@ const Register = () => {
         name: '',
         email: '',
         password: '',
+        active: false,
         geolocation: {
             lat: 1,
             lng:1
         },
         category: 'client',
         description: '',
-        phone: 0
+        phone: ''
     })
 
     const {name, email, password} = formData;

@@ -29,6 +29,7 @@ const OAuth = () => {
                 await setDoc(doc(db, 'users', user.uid), {
                     name: user.displayName,
                     email: user.email,
+                    active: false,
                     geolocation: {
                         lat: 1,
                         lng:1
@@ -62,6 +63,7 @@ const OAuth = () => {
                 await setDoc(doc(db, 'users', user.uid), {
                     name: user.displayName,
                     email: user.email,
+                    active: false,
                     geolocation: {
                         lat: 1,
                         lng:1

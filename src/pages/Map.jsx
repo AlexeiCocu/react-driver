@@ -50,7 +50,9 @@ const Map = () => {
             // Get reference
             const usersRef = collection(db, 'users')
             // Create a query
-            const q = query(usersRef, where('email', '!=',  auth.currentUser.email))
+            // const q = query(usersRef, where('email', '!=',  auth.currentUser.email))
+            const q = query(usersRef, where('active', '==',  true))
+
 
             // const q = query(usersRef)
 
@@ -97,12 +99,12 @@ const Map = () => {
 
     return (
        <>
+           <button className='btn btn-info' onClick={()=>fetchAllUsers()}>Refresh</button>
            <MapContainer style={{height: '90vh', width: '100vw'}}
                          center={[userLocation.lat, userLocation.lng]}
                          zoom={13} scrollWheelZoom={true}>
                <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-
 
 
                {users.map((user) => (
@@ -111,8 +113,8 @@ const Map = () => {
                    </Marker>
                ))}
 
-               <Marker position={[userLocation.lat, userLocation.lng]} icon={redIcon} >
-                   <Popup>{user.name} / Not Visible</Popup>
+               <Marker position={[userLocation.lat, userLocation.lng]} icon={user.active ? greenIcon : redIcon} >
+                   <Popup>{user.name} / {user.active ? 'Visible' : 'Not Visible'}</Popup>
                </Marker>
 
            </MapContainer>
