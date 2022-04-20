@@ -29,6 +29,13 @@ const OAuth = () => {
                 await setDoc(doc(db, 'users', user.uid), {
                     name: user.displayName,
                     email: user.email,
+                    geolocation: {
+                        lat: 1,
+                        lng:1
+                    },
+                    category: 'client',
+                    description: '',
+                    phone: '',
                     timeStamp: serverTimestamp()
                 })
             }

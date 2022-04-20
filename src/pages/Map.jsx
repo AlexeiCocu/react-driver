@@ -11,9 +11,7 @@ import Spinner from "../components/Spinner";
 const Map = () => {
     const [user, setUser] = useState(null);
     const [users, setUsers] = useState(null);
-
     const [userLocation, setUserLocation] = useState(null)
-
     const [loading, setLoading] = useState(true);
 
     const auth = getAuth();
@@ -37,9 +35,6 @@ const Map = () => {
     });
 
 
-
-
-
     const fetchUsers = async () => {
         const docRef = doc(db, 'users', auth.currentUser.uid)
         const docSnap = await getDoc(docRef)
@@ -54,14 +49,16 @@ const Map = () => {
         try {
             // Get reference
             const usersRef = collection(db, 'users')
-
             // Create a query
             const q = query(usersRef, where('email', '!=',  auth.currentUser.email))
 
+            // const q = query(usersRef)
+
             // Execute query
             const querySnap = await getDocs(q);
-
             const allUsers = [];
+
+            console.log(allUsers)
 
             querySnap.forEach((doc) => {
                 return allUsers.push({
@@ -71,7 +68,6 @@ const Map = () => {
                     lng: doc.data().geolocation.lng
                 })
             })
-
 
             setUsers(allUsers);
             setLoading(false);
@@ -106,9 +102,7 @@ const Map = () => {
                          zoom={13} scrollWheelZoom={true}>
                <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-               <Marker position={[userLocation.lat, userLocation.lng]} icon={redIcon} >
-                   <Popup>{user.name} / Not Visible</Popup>
-               </Marker>
+
 
 
                {users.map((user) => (
@@ -116,6 +110,10 @@ const Map = () => {
                        <Popup>{user.data.name}</Popup>
                    </Marker>
                ))}
+
+               <Marker position={[userLocation.lat, userLocation.lng]} icon={redIcon} >
+                   <Popup>{user.name} / Not Visible</Popup>
+               </Marker>
 
            </MapContainer>
        </>

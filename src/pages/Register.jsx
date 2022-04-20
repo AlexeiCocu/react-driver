@@ -20,7 +20,7 @@ const Register = () => {
         },
         category: 'client',
         description: '',
-        phone: ''
+        phone: 0
     })
 
     const {name, email, password} = formData;
