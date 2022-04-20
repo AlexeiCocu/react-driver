@@ -13,11 +13,17 @@ const Register = () => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
-        password: ''
+        password: '',
+        geolocation: {
+            lat: 1,
+            lng:1
+        },
+        category: 'client',
+        description: '',
+        phone: ''
     })
 
     const {name, email, password} = formData;
-
     const navigate = useNavigate();
 
     const onChange = (e) => {
@@ -50,7 +56,6 @@ const Register = () => {
         }catch (error) {
             toast.error('Something went wrong!')
         }
-
     }
 
     return (
