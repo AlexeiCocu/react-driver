@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {MapContainer, Marker, Popup, TileLayer} from "react-leaflet";
+import * as L from "leaflet";
 import {getAuth} from "firebase/auth";
 import {updateDoc, doc, getDoc, collection, getDocs, query, where, orderBy, limit, startAfter} from 'firebase/firestore';
 import {db} from "../firebase.config";
@@ -17,75 +18,82 @@ const Map = () => {
 
     const auth = getAuth();
 
+    const greenIcon = new L.Icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
+
+    const redIcon = new L.Icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
+
+
+
+
+
+    const fetchUsers = async () => {
+        const docRef = doc(db, 'users', auth.currentUser.uid)
+        const docSnap = await getDoc(docRef)
+
+        if(docSnap.exists()){
+            setUser(docSnap.data())
+            setLoading(false)
+        }
+    }
+    const fetchAllUsers = async () => {
+
+        try {
+            // Get reference
+            const usersRef = collection(db, 'users')
+
+            // Create a query
+            const q = query(usersRef, where('email', '!=',  auth.currentUser.email))
+
+            // Execute query
+            const querySnap = await getDocs(q);
+
+            const allUsers = [];
+
+            querySnap.forEach((doc) => {
+                return allUsers.push({
+                    id: doc.id,
+                    data: doc.data(),
+                    lat: doc.data().geolocation.lat,
+                    lng: doc.data().geolocation.lng
+                })
+            })
+
+
+            setUsers(allUsers);
+            setLoading(false);
+        } catch (error) {
+            toast.error('Could not fetch users!')
+        }
+    }
+
     useEffect(()=>{
         setUser(auth.currentUser)
-
         navigator.geolocation.getCurrentPosition(function(position) {
-
             setUserLocation({
                 lat: position.coords.latitude,
                 lng: position.coords.longitude
             })
-
-            console.log("Latitude is :", position.coords.latitude);
-            console.log("Longitude is :", position.coords.longitude);
         });
-
-    },[])
-
-
-    useEffect(()=>{
-        const fetchUsers = async () => {
-            const docRef = doc(db, 'users', auth.currentUser.uid)
-            const docSnap = await getDoc(docRef)
-
-            if(docSnap.exists()){
-                setUser(docSnap.data())
-                setLoading(false)
-            }
-        }
-
-
-        const fetchAllUsers = async () => {
-
-            try {
-                // Get reference
-                const usersRef = collection(db, 'users')
-
-                // Create a query
-                const q = query(usersRef, where('email', '!=',  auth.currentUser.email))
-
-                // Execute query
-                const querySnap = await getDocs(q);
-
-                const allUsers = [];
-
-                querySnap.forEach((doc) => {
-                    return allUsers.push({
-                        id: doc.id,
-                        data: doc.data(),
-                        lat: doc.data().geolocation.lat,
-                        lng: doc.data().geolocation.lng
-                    })
-                })
-
-                console.log(allUsers)
-
-                setUsers(allUsers);
-                setLoading(false);
-            } catch (error) {
-                toast.error('Could not fetch users!')
-            }
-
-        }
-
 
         fetchAllUsers()
         fetchUsers();
 
-    }, [])
+    },[])
 
-    // return user ? <h1>{user.displayName}, in map</h1> : 'Not logged in'
 
     if(loading){
         return <Spinner />
@@ -98,12 +106,15 @@ const Map = () => {
                          zoom={13} scrollWheelZoom={true}>
                <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-               <Marker position={[userLocation.lat, userLocation.lng]}/>
-
+               <Marker position={[userLocation.lat, userLocation.lng]} icon={redIcon} >
+                   <Popup>{user.name} / Not Visible</Popup>
+               </Marker>
 
 
                {users.map((user) => (
-                   <Marker position={[user.lat, user.lng]} key={user.id}/>
+                   <Marker position={[user.lat, user.lng]} key={user.id}>
+                       <Popup>{user.data.name}</Popup>
+                   </Marker>
                ))}
 
            </MapContainer>

@@ -5,6 +5,7 @@ import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'firebase
 import { setDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase.config';
 import OAuth from "../components/OAuth";
+import {FaEyeSlash} from "react-icons/fa";
 
 
 const Register = () => {
@@ -54,21 +55,58 @@ const Register = () => {
 
     return (
         <div className='page'>
-            <form onSubmit={onSubmit}>
-                <input type="text" className='' placeholder='Name' id='name' value={name} onChange={onChange}/>
-                <input type="email" className='' placeholder='Email' id='email' value={email} onChange={onChange}/>
-                <input type={showPassword ? 'text' : 'password'} placeholder='Password' id='password' value={password} onChange={onChange}/>
-                <div className='btn' onClick={()=>setShowPassword((prevState => !prevState))}>Show Password</div>
 
 
-                <button className='btn btn__green'>Register</button>
+            <div className="center">
+                {/*<h1>Login</h1>*/}
+                <div className='oauth_container'>
+                    <OAuth/>
+                </div>
+                <hr/>
 
-                <OAuth/>
+                <form onSubmit={onSubmit}>
+
+                    <div className="txt_field">
+                        <label>Name</label>
+                        <input type="text" id='name' value={name} onChange={onChange} required />
+                        <span></span>
+                    </div>
+                    <div className="txt_field">
+                        <label>Email</label>
+                        <input type="email" id='email' value={email} onChange={onChange} required />
+                        <span></span>
+                    </div>
+                    <div className="txt_field">
+                        <label>Password</label>
+                        <input type={showPassword ? 'text' : 'password'} id='password' value={password} onChange={onChange} required />
+                        <span></span>
+                        <FaEyeSlash onClick={()=>setShowPassword((prevState => !prevState))} className='showPassword'/>
+                    </div>
+
+                    {/*<Link to='/forgot-password' className="pass">Forgot Password</Link>*/}
+                    <input type="submit" value="Register" />
+                    <div className="signup_link">
+                        Already a member? <Link to='/' ><button className='btn btn__red'>Login</button></Link>
+                    </div>
+                </form>
+            </div>
 
 
-            </form>
+            {/*<form onSubmit={onSubmit}>*/}
+            {/*    /!*<input type="text" className='' placeholder='Name' id='name' value={name} onChange={onChange}/>*!/*/}
+            {/*    /!*<input type="email" className='' placeholder='Email' id='email' value={email} onChange={onChange}/>*!/*/}
+            {/*    /!*<input type={showPassword ? 'text' : 'password'} placeholder='Password' id='password' value={password} onChange={onChange}/>*!/*/}
+            {/*    /!*<div className='btn' onClick={()=>setShowPassword((prevState => !prevState))}>Show Password</div>*!/*/}
 
-            <Link to='/' ><button className='btn btn__red'>Log In</button></Link>
+
+            {/*    /!*<button className='btn btn__green'>Register</button>*!/*/}
+            {/*    */}
+            {/*    /!*<OAuth/>*!/*/}
+
+
+            {/*</form>*/}
+
+            {/*<Link to='/' ><button className='btn btn__red'>Log In</button></Link>*/}
         </div>
     );
 };

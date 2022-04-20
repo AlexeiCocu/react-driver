@@ -1,10 +1,13 @@
 import React from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
-import {getAuth, signInWithPopup, GoogleAuthProvider} from 'firebase/auth';
+import {getAuth, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider } from 'firebase/auth';
 import {doc, setDoc, getDoc, serverTimestamp} from 'firebase/firestore';
 import {db} from "../firebase.config";
 import {toast} from "react-toastify";
 import googleIcon from '../assets/svg/googleIcon.svg'
+
+import {FcGoogle} from 'react-icons/fc'
+import {FaFacebook} from 'react-icons/fa'
 
 const OAuth = () => {
     const navigate = useNavigate();
@@ -36,13 +39,37 @@ const OAuth = () => {
         }
     }
 
+    const onFacebookClick = async () => {
+        try{
+            const auth = getAuth();
+            const provider = new FacebookAuthProvider();
+            const result = await signInWithPopup(auth, provider);
+            const user = result.user;
+
+            // check for user
+            const decRef = doc(db, 'users', user.uid);
+            const docSnap = await getDoc(decRef);
+
+            // if user doesn't exist - create user
+            if(!docSnap.exists()){
+                await setDoc(doc(db, 'users', user.uid), {
+                    name: user.displayName,
+                    email: user.email,
+                    timeStamp: serverTimestamp()
+                })
+            }
+            navigate('/map');
+
+        }catch (error){
+            toast.error('Could not authorize wit Facebook!')
+        }
+    }
+
     return (
-        <div className='socialLogin'>
-            <p>{location.pathname === '/' ? 'Register' : 'Login'} with </p>
-            <button className='socialIconDiv' onClick={onGoogleClick}>
-                <img className='socialIconImg' src={googleIcon} alt="google icon"/>
-            </button>
-        </div>
+        <>
+            <FcGoogle onClick={onGoogleClick} className='social_icon'/>
+            <FaFacebook onClick={onFacebookClick} className='social_icon facebook'/>
+        </>
     );
 };
 

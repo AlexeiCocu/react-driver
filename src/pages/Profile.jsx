@@ -39,25 +39,25 @@ const Profile = () => {
 
 
     const onSubmit = async () => {
-        try {
-            if(auth.currentUser.displayName !== name){
-                // Update display name in fb
-                await updateProfile(auth.currentUser, {
-                    displayName: name
-                })
-
-                // Update in firestore
-                const userRef = doc(db, 'users', auth.currentUser.uid);
-                await updateDoc(userRef, {
-                    name: name
-                })
-
-                toast.success('Name changed successfully!')
-            }
-
-        }catch (error){
-            toast.error('Could not update profile')
-        }
+        // try {
+        //     if(auth.currentUser.displayName !== name){
+        //         // Update display name in fb
+        //         await updateProfile(auth.currentUser, {
+        //             displayName: name
+        //         })
+        //
+        //         // Update in firestore
+        //         const userRef = doc(db, 'users', auth.currentUser.uid);
+        //         await updateDoc(userRef, {
+        //             name: name
+        //         })
+        //
+        //         toast.success('Name changed successfully!')
+        //     }
+        //
+        // }catch (error){
+        //     toast.error('Could not update profile')
+        // }
     }
 
     const onChange = (e) => {
@@ -66,6 +66,8 @@ const Profile = () => {
             [e.target.id]: e.target.value
         }))
     }
+
+
 
     if(loading){
         return <Spinner />
@@ -99,6 +101,12 @@ const Profile = () => {
             <div>
                 <h3>User details</h3>
                 <div>{user.category}</div>
+            </div>
+
+            <div>
+                <Link to={"/edit-profile"}>
+                    <button>Edit Profile</button>
+                </Link>
             </div>
         </>
     )

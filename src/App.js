@@ -8,6 +8,7 @@ import Register from "./pages/Register";
 import Map from "./pages/Map";
 import ForgotPassword from "./pages/ForgotPassword";
 import PrivateRoute from "./components/PrivateRoute";
+import EditProfile from "./pages/EditProfile";
 
 
 function App() {
@@ -24,6 +25,10 @@ function App() {
 
                 <Route path='/profile' element={<PrivateRoute />}>
                     <Route path='/profile' element={<Profile />} />
+                </Route>
+
+                <Route path='/edit-profile' element={<PrivateRoute />}>
+                    <Route path='/edit-profile' element={<EditProfile />} />
                 </Route>
 
                 <Route path='/forgot-password' element={<ForgotPassword />} />

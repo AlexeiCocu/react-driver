@@ -3,6 +3,8 @@ import {Link, useNavigate} from "react-router-dom";
 import { getAuth,signInWithEmailAndPassword  } from 'firebase/auth';
 import {toast} from "react-toastify";
 import OAuth from "../components/OAuth";
+import { FaEyeSlash } from 'react-icons/fa'
+
 
 const LogIn = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -42,19 +44,36 @@ const LogIn = () => {
 
     return (
         <div className='page'>
-            <form onSubmit={onSubmit}>
-                <input type="email" className='' placeholder='Email' id='email' value={email} onChange={onChange}/>
-                <input type={showPassword ? 'text' : 'password'} placeholder='Password' id='password' value={password} onChange={onChange}/>
-                <div className='btn' onClick={()=>setShowPassword((prevState => !prevState))}>Show Password</div>
 
-                <button className='btn btn__green'>Sign In</button>
+            <div className="center">
+                {/*<h1>Login</h1>*/}
+                <div className='oauth_container'>
+                    <OAuth/>
+                </div>
+                <hr/>
 
-                <OAuth/>
-            </form>
+                <form onSubmit={onSubmit}>
 
-            <Link to='/forgot-password'>Forgot Password</Link>
+                    <div className="txt_field">
+                        <label>Email</label>
+                        <input type="email" id='email' value={email} onChange={onChange} required />
+                        <span></span>
+                    </div>
+                    <div className="txt_field">
+                        <label>Password</label>
+                        <input type={showPassword ? 'text' : 'password'} id='password' value={password} onChange={onChange} required />
+                        <span></span>
+                        <FaEyeSlash onClick={()=>setShowPassword((prevState => !prevState))} className='showPassword'/>
+                    </div>
 
-            <Link to='/register' ><button className='btn btn__red'>Register</button></Link>
+                    {/*<Link to='/forgot-password' className="pass">Forgot Password</Link>*/}
+                    <input type="submit" value="Login" />
+                        <div className="signup_link">
+                            Not a member? <Link to='/register' ><button className='btn btn__red'>Register</button></Link>
+                        </div>
+                </form>
+            </div>
+
         </div>
     );
 };
