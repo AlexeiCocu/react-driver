@@ -16,6 +16,7 @@ import Spinner from '../components/Spinner'
 
 const EditProfile = () => {
     const [active, setActive] = useState(false)
+    const [geolocation, setGeolocation] = useState(null)
     const [loading, setLoading] = useState(false)
     const [user, setUser] = useState(false)
     const [formData, setFormData] = useState({
@@ -37,52 +38,10 @@ const EditProfile = () => {
     const isMounted = useRef(true)
 
 
-    // set active
-    useEffect(() => {
-
-    }, [active])
-
 
     // Fetch listing to edit
     useEffect(() => {
         setLoading(true);
-
-
-        const fetchUser = async () => {
-            const docRef = doc(db, 'users', auth.currentUser.uid)
-            const docSnap = await getDoc(docRef)
-
-            if (docSnap.exists()){
-                setUser(docSnap.data())
-
-                setFormData({ ...docSnap.data() })
-                setLoading(false)
-
-            }else{
-                navigate('/')
-                toast.error('User does not exist.')
-            }
-        }
-        fetchUser()
-
-    }, [])
-
-
-
-    const handleActive = async () => {
-
-        setActive((prevState => !prevState))
-
-        if(active){
-            toast.error('Removed from map')
-
-        }else {
-            toast.success('Posted on map')
-        }
-
-    }
-
-    useEffect(()=>{
 
         const fetchUser = async () => {
             const docRef = doc(db, 'users', auth.currentUser.uid)
@@ -103,10 +62,17 @@ const EditProfile = () => {
 
 
         const setActiveStatus = async () => {
+
+            const formDataCopy = {
+                ...formData,
+                geolocation,
+                active
+            }
+
             //Update listing
             const docRef = doc(db, 'users', auth.currentUser.uid);
             await updateDoc(docRef, {
-                active,
+                geolocation
             })
 
         }
@@ -116,8 +82,40 @@ const EditProfile = () => {
 
         setActiveStatus()
 
+        fetchUser()
 
     }, [active])
+
+
+
+    const handleActive = async () => {
+
+        setActive((prevState => !prevState))
+
+        navigator.geolocation.getCurrentPosition(function(position) {
+            setGeolocation({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+            })
+        });
+
+        //Update listing
+        const docRef = doc(db, 'users', auth.currentUser.uid);
+        await updateDoc(docRef, {
+            active: active,
+            geolocation,
+        })
+
+        if(active){
+            toast.error('Removed from map')
+
+        }else {
+            toast.success('Posted on map')
+        }
+
+    }
+
+
 
 
 
@@ -175,7 +173,7 @@ const EditProfile = () => {
         <div className='page mt-4'>
 
 
-            <form className='card col-md-6' onSubmit={onSubmit}>
+            <form className='card col-10 col-md-6' onSubmit={onSubmit}>
 
                 <div className='mt-2  d-flex flex-column align-items-center justify-content-between'>
                     <h5 className='m-1'>Edit Profile</h5>

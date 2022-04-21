@@ -39,7 +39,7 @@ const Profile = () => {
     return (
 
         <div className='d-flex justify-content-center align-items-center mt-4'>
-            <div className='card m-3'>
+            <div className='card m-3 col-10 col-md-6'>
                 <h3 className='mt-4 text-center'>User Profile</h3>
                 <hr/>
                 <div>
