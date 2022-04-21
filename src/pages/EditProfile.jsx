@@ -1,12 +1,6 @@
 import React from 'react';
 import { useState, useEffect, useRef } from 'react'
 import {getAuth, onAuthStateChanged, updateProfile} from 'firebase/auth'
-import {
-    getStorage,
-    ref,
-    uploadBytesResumable,
-    getDownloadURL,
-} from 'firebase/storage'
 import { doc, updateDoc, getDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../firebase.config'
 import {v4 as uuidv4} from 'uuid'
@@ -15,7 +9,7 @@ import { toast } from 'react-toastify'
 import Spinner from '../components/Spinner'
 
 const EditProfile = () => {
-    const [active, setActive] = useState(false)
+    const [activeHandle, setActiveHandle] = useState(false)
     const [geolocation, setGeolocation] = useState(null)
     const [loading, setLoading] = useState(false)
     const [user, setUser] = useState(false)
@@ -32,16 +26,19 @@ const EditProfile = () => {
         description,
     } = formData
 
-
     const auth = getAuth()
     const navigate = useNavigate()
-    const isMounted = useRef(true)
-
-
 
     // Fetch listing to edit
     useEffect(() => {
         setLoading(true);
+
+        navigator.geolocation.getCurrentPosition(function(position) {
+            setGeolocation({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+            })
+        });
 
         const fetchUser = async () => {
             const docRef = doc(db, 'users', auth.currentUser.uid)
@@ -51,6 +48,7 @@ const EditProfile = () => {
                 setUser(docSnap.data())
 
                 setFormData({ ...docSnap.data() })
+
                 setLoading(false)
 
             }else{
@@ -58,64 +56,47 @@ const EditProfile = () => {
                 toast.error('User does not exist.')
             }
         }
-
-
-
-        const setActiveStatus = async () => {
-
-            const formDataCopy = {
-                ...formData,
-                geolocation,
-                active
-            }
-
-            //Update listing
-            const docRef = doc(db, 'users', auth.currentUser.uid);
-            await updateDoc(docRef, {
-                geolocation
-            })
-
-        }
-
-
         fetchUser()
 
-        setActiveStatus()
 
-        fetchUser()
-
-    }, [active])
+    }, [activeHandle])
 
 
 
     const handleActive = async () => {
 
-        setActive((prevState => !prevState))
+        setLoading(true)
 
-        navigator.geolocation.getCurrentPosition(function(position) {
+        setActiveHandle((prevState => !prevState))
+
+        await navigator.geolocation.getCurrentPosition(function(position) {
             setGeolocation({
                 lat: position.coords.latitude,
                 lng: position.coords.longitude
             })
         });
 
-        //Update listing
-        const docRef = doc(db, 'users', auth.currentUser.uid);
-        await updateDoc(docRef, {
-            active: active,
+        const formDataCopy = {
+            ...formData,
             geolocation,
-        })
-
-        if(active){
-            toast.error('Removed from map')
-
-        }else {
-            toast.success('Posted on map')
+            active: activeHandle
         }
 
+
+        //Update listing
+        const docRef = doc(db, 'users', auth.currentUser.uid);
+        await updateDoc(docRef, formDataCopy)
+
+        setLoading(false)
+
+
+        // if(activeHandle){
+        //     toast.error('Removed from map')
+        //
+        // }else {
+        //     toast.success('Posted on map')
+        // }
     }
-
-
 
 
 
@@ -177,7 +158,8 @@ const EditProfile = () => {
 
                 <div className='mt-2  d-flex flex-column align-items-center justify-content-between'>
                     <h5 className='m-1'>Edit Profile</h5>
-                    <div className={ user.active ? 'btn btn-success mt-1' : 'btn btn-danger mt-1' } onClick={()=>handleActive()} >{ user.active ? 'Online' : 'Offline'}</div>
+                    <div className={ user.active ? 'btn btn-success mt-1' : 'btn btn-danger mt-1' }
+                         onClick={()=>handleActive()} >{ user.active ? 'Online' : 'Offline'}</div>
                 </div>
                 <hr/>
 

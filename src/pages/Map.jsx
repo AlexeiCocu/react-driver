@@ -109,13 +109,20 @@ const Map = () => {
 
                {users.map((user) => (
                    <Marker position={[user.lat, user.lng]} key={user.id}>
-                       <Popup>{user.data.name}</Popup>
+                       <Popup>
+                           <div>{user.data.name}</div>
+                           <div>Tel: <a href={'tel:' + user.data.phone}>{user.data.phone}</a></div>
+                           <div>{user.data.description}</div>
+                       </Popup>
                    </Marker>
                ))}
 
-               <Marker position={[userLocation.lat, userLocation.lng]} icon={user.active ? greenIcon : redIcon} >
-                   <Popup>{user.name} / {user.active ? 'Visible' : 'Not Visible'}</Popup>
-               </Marker>
+               {!user.active ?  <Marker position={[userLocation.lat, userLocation.lng]} icon={user.active ? greenIcon : redIcon} >
+                   <Popup>
+                       {user.name} / {user.active ? 'Visible' : 'Not Visible'}
+                   </Popup>
+               </Marker> : ''}
+
 
            </MapContainer>
        </>
